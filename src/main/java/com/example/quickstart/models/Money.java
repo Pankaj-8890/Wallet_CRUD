@@ -1,36 +1,41 @@
 package com.example.quickstart.models;
 
 
+import com.example.quickstart.exceptions.InsufficientFundsException;
 import com.example.quickstart.exceptions.InvalidAmountException;
-import jakarta.persistence.Column;
+import lombok.*;
 
-import java.util.Currency;
+import java.util.Objects;
 
+
+@Getter
+@Setter
+@NoArgsConstructor
+@EqualsAndHashCode
 public class Money {
 
     private Integer value;
+
     private CurrencyType currencyType;
 
-    public Money(){
-        this.value = 0;
-        this.currencyType = CurrencyType.INR;
+
+    public Money(Integer value, CurrencyType currency) throws InvalidAmountException {
+        if (value < 0) {
+            throw new InvalidAmountException("Money should be positive.");
+        }
+        this.value = value;
+        this.currencyType = currency;
     }
 
-    public void setValue(Integer value,CurrencyType currencyType) throws InvalidAmountException {
-        if(this.currencyType != currencyType) throw new InvalidAmountException("currencyType mismatch");
-        this.value += value;
-        this.currencyType = currencyType;
+    public void subtract(Money money) throws InsufficientFundsException {
+        if(this.value < money.getValue()) throw new InsufficientFundsException("Insufficient funds in wallet");
+        this.value -= money.getValue();
     }
 
-    public int getValue(){
-        return this.value;
+    public void add(Money money) throws InvalidAmountException {
+        if(money.getValue() < 0 ) throw new InvalidAmountException("Insufficient funds in wallet");
+        this.value += money.getValue();
     }
 
-    public void setCurrencyType(CurrencyType currencyType) {
-        this.currencyType = currencyType;
-    }
 
-    public CurrencyType getCurrencyType(){
-        return this.currencyType;
-    }
 }

@@ -1,43 +1,43 @@
 package com.example.quickstart.models;
 
+import com.example.quickstart.exceptions.InsufficientFundsException;
 import com.example.quickstart.exceptions.InvalidAmountException;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-import org.hibernate.annotations.Type;
-import org.springframework.stereotype.Component;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
 
 @Entity
+@Getter
+@Setter
+@AllArgsConstructor
 public class Wallet {
 
+    @Getter
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "wallet_seq")
     @SequenceGenerator(name = "wallet_seq", sequenceName = "wallet_seq", allocationSize = 1)
     @Column(name = "id")
-    private Long id;
+    private Integer id;
 
 
     @Embedded
     private Money money;
 
-    @Column
-    private Integer amount;
 
-    public Wallet(){
-       this.money = new Money();
-       amount = money.getValue();
+    public Wallet() throws InvalidAmountException {
+       this.money = new Money(0,CurrencyType.INR);
     }
 
-    public Long getId(){
-        return this.id;
+    public void withdraw(Money money) throws InsufficientFundsException {
+
+        this.money.subtract(money);
     }
 
-    public int getMoney(){
-        return money.getValue();
+    public void deposit(Money money) throws InvalidAmountException {
+        this.money.add(money);
     }
 
-    public void setMoney(int money,CurrencyType currencyType) throws InvalidAmountException {
-        this.money.setValue(money,currencyType);
-    }
 
 }

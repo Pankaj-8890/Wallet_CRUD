@@ -10,6 +10,8 @@ import com.example.quickstart.repository.WalletRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class WalletService {
 
@@ -17,7 +19,7 @@ public class WalletService {
     @Autowired
     private WalletRepository walletRepository;
 
-    public WalletResponseModel createWallet(){
+    public WalletResponseModel createWallet() throws InvalidAmountException {
         Wallet wallet = new Wallet();
         walletRepository.save(wallet);
         return new WalletResponseModel(wallet.getId(), wallet.getMoney());
@@ -25,19 +27,15 @@ public class WalletService {
     public WalletResponseModel addMoney(Long id, Money money) throws InvalidAmountException {
 
         Wallet wallet = walletRepository.findById(id).orElse(new Wallet());
-
-        if(money.getValue() < 0 ) throw new InvalidAmountException("Invalid amount");
-        wallet.setMoney(money.getValue(),money.getCurrencyType());
+        wallet.deposit(money);
         walletRepository.save(wallet);
         return new WalletResponseModel(wallet.getId(),wallet.getMoney());
     }
 
-    public WalletResponseModel withdrawMoney(Long id,Money money) throws InsufficientFundsException, InvalidAmountException {
+    public WalletResponseModel withdrawMoney(Long id,Money money) throws InsufficientFundsException {
 
         Wallet wallet = walletRepository.findById(id).orElseThrow(RuntimeException::new);
-
-        if(money.getValue() < 0 || wallet.getMoney() < money.getValue() || wallet.getMoney() == 0) throw new InsufficientFundsException("Insufficient funds in wallet");
-        wallet.setMoney(-(money.getValue()),money.getCurrencyType());
+        wallet.withdraw(money);
         walletRepository.save(wallet);
         return new WalletResponseModel(wallet.getId(),wallet.getMoney());
     }
@@ -45,6 +43,10 @@ public class WalletService {
     public WalletResponseModel getMoney(Long id){
         Wallet wallet = walletRepository.findById(id).orElseThrow(RuntimeException::new);
         return new WalletResponseModel(wallet.getId(),wallet.getMoney());
+    }
+
+    public List<WalletResponseModel> getWallets(){
+        return walletRepository.findAll().stream().map(w->new WalletResponseModel(w.getId(),w.getMoney())).toList();
     }
 
 }
