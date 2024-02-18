@@ -10,8 +10,8 @@ import java.util.Objects;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @EqualsAndHashCode
+@NoArgsConstructor
 public class Money {
 
     private Integer value;
@@ -27,12 +27,14 @@ public class Money {
         this.currencyType = currency;
     }
 
-    public void subtract(Money money) throws InsufficientFundsException {
+    public void subtract(Money money) throws InsufficientFundsException, InvalidAmountException {
+        if(this.currencyType != money.getCurrencyType()) throw new InvalidAmountException("currency type should be same");
         if(this.value < money.getValue()) throw new InsufficientFundsException("Insufficient funds in wallet");
         this.value -= money.getValue();
     }
 
     public void add(Money money) throws InvalidAmountException {
+        if(this.currencyType != money.getCurrencyType()) throw new InvalidAmountException("currency type should be same");
         if(money.getValue() < 0 ) throw new InvalidAmountException("Insufficient funds in wallet");
         this.value += money.getValue();
     }

@@ -14,10 +14,8 @@ import lombok.Setter;
 @AllArgsConstructor
 public class Wallet {
 
-    @Getter
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "wallet_seq")
-    @SequenceGenerator(name = "wallet_seq", sequenceName = "wallet_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Integer id;
 
@@ -25,12 +23,11 @@ public class Wallet {
     @Embedded
     private Money money;
 
-
     public Wallet() throws InvalidAmountException {
        this.money = new Money(0,CurrencyType.INR);
     }
 
-    public void withdraw(Money money) throws InsufficientFundsException {
+    public void withdraw(Money money) throws InsufficientFundsException, InvalidAmountException {
 
         this.money.subtract(money);
     }
@@ -41,3 +38,4 @@ public class Wallet {
 
 
 }
+//    @SequenceGenerator(name = "wallet_seq", sequenceName = "wallet_seq", allocationSize = 1)

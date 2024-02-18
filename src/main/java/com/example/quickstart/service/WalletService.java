@@ -4,10 +4,13 @@ package com.example.quickstart.service;
 import com.example.quickstart.exceptions.InsufficientFundsException;
 import com.example.quickstart.exceptions.InvalidAmountException;
 import com.example.quickstart.models.Money;
+import com.example.quickstart.models.Users;
 import com.example.quickstart.models.Wallet;
 import com.example.quickstart.models.WalletResponseModel;
+import com.example.quickstart.repository.UserRepository;
 import com.example.quickstart.repository.WalletRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,25 +22,30 @@ public class WalletService {
     @Autowired
     private WalletRepository walletRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     public WalletResponseModel createWallet() throws InvalidAmountException {
+
         Wallet wallet = new Wallet();
         walletRepository.save(wallet);
         return new WalletResponseModel(wallet.getId(), wallet.getMoney());
     }
-    public WalletResponseModel addMoney(Long id, Money money) throws InvalidAmountException {
+    public WalletResponseModel addMoney(String username, Money money) throws Exception {
 
-        Wallet wallet = walletRepository.findById(id).orElse(new Wallet());
-        wallet.deposit(money);
-        walletRepository.save(wallet);
-        return new WalletResponseModel(wallet.getId(),wallet.getMoney());
+
+        Users users = userRepository.findByUsername(username).orElseThrow(()->new UsernameNotFoundException("user not found"));
+        users.getWallet().deposit(money);
+        userRepository.save(users);
+        return new WalletResponseModel(users.getWallet().getId(),users.getWallet().getMoney());
     }
 
-    public WalletResponseModel withdrawMoney(Long id,Money money) throws InsufficientFundsException {
+    public WalletResponseModel withdrawMoney(String username,Money money) throws InsufficientFundsException, InvalidAmountException {
 
-        Wallet wallet = walletRepository.findById(id).orElseThrow(RuntimeException::new);
-        wallet.withdraw(money);
-        walletRepository.save(wallet);
-        return new WalletResponseModel(wallet.getId(),wallet.getMoney());
+        Users users = userRepository.findByUsername(username).orElseThrow(()->new UsernameNotFoundException("user not found"));
+        users.getWallet().withdraw(money);
+        userRepository.save(users);
+        return new WalletResponseModel(users.getWallet().getId(),users.getWallet().getMoney());
     }
 
     public WalletResponseModel getMoney(Long id){
@@ -46,7 +54,7 @@ public class WalletService {
     }
 
     public List<WalletResponseModel> getWallets(){
-        return walletRepository.findAll().stream().map(w->new WalletResponseModel(w.getId(),w.getMoney())).toList();
+        return walletRepository.findAll().stream().map(wallet->new WalletResponseModel(wallet.getId(),wallet.getMoney())).toList();
     }
 
 }
