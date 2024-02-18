@@ -1,17 +1,16 @@
 package com.example.quickstart.config;
 
-import com.example.quickstart.models.Users;
+import com.example.quickstart.models.UsersModel;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 
 import java.util.Collection;
 
 public class UserDetails implements org.springframework.security.core.userdetails.UserDetails {
 
 
-    private Users user;
+    private UsersModel user;
 
-    public UserDetails(Users user) {
+    public UserDetails(UsersModel user) {
         this.user = user;
     }
 

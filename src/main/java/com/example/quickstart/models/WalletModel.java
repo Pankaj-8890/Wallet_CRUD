@@ -12,7 +12,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class Wallet {
+public class WalletModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,7 +23,7 @@ public class Wallet {
     @Embedded
     private Money money;
 
-    public Wallet() throws InvalidAmountException {
+    public WalletModel() throws InvalidAmountException {
        this.money = new Money(0,CurrencyType.INR);
     }
 

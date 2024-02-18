@@ -1,10 +1,8 @@
 package com.example.quickstart.config;
 
-import com.example.quickstart.models.Users;
+import com.example.quickstart.models.UsersModel;
 import com.example.quickstart.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -19,7 +17,7 @@ public class UserDetailService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException{
 
-        Users user = this.userRepository.findByUsername(username).orElseThrow(()->new UsernameNotFoundException("user"));
+        UsersModel user = this.userRepository.findByUsername(username).orElseThrow(()->new UsernameNotFoundException("user"));
         return new com.example.quickstart.config.UserDetails(user);
     }
 

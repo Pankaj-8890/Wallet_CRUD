@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.security.core.userdetails.UserDetails;
 
 
 @Getter
@@ -13,7 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-public class Users {
+public class UsersModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,9 +27,9 @@ public class Users {
     private String password;
 
     @OneToOne(cascade = CascadeType.ALL)
-    private Wallet wallet;
+    private WalletModel wallet;
 
-    public Users(String username, String password,Wallet wallet){
+    public UsersModel(String username, String password, WalletModel wallet){
         this.username = username;
         this.password = password;
         this.wallet = wallet;
