@@ -3,6 +3,9 @@ package com.example.quickstart.models;
 
 import com.example.quickstart.exceptions.InsufficientFundsException;
 import com.example.quickstart.exceptions.InvalidAmountException;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.*;
 
 import java.util.Objects;
@@ -11,15 +14,17 @@ import java.util.Objects;
 @Getter
 @Setter
 @EqualsAndHashCode
+@Embeddable
 @NoArgsConstructor
 public class Money {
 
-    private Integer value;
+    private Double value;
 
+    @Enumerated(EnumType.STRING)
     private CurrencyType currencyType;
 
 
-    public Money(Integer value, CurrencyType currency) throws InvalidAmountException {
+    public Money(Double value, CurrencyType currency) throws InvalidAmountException {
         if (value < 0) {
             throw new InvalidAmountException("Money should be positive.");
         }
@@ -27,17 +32,15 @@ public class Money {
         this.currencyType = currency;
     }
 
-    public void subtract(Money money) throws InsufficientFundsException, InvalidAmountException {
-        if(this.currencyType != money.getCurrencyType()) throw new InvalidAmountException("currency type should be same");
-        if(this.value < money.getValue()) throw new InsufficientFundsException("Insufficient funds in wallet");
-        this.value -= money.getValue();
+    public void subtract(Money money) throws InsufficientFundsException {
+        if(this.value < (money.getValue()*money.getCurrencyType().getConversionFactor())) throw new InsufficientFundsException("Insufficient funds in wallet");
+        this.value -= (money.getValue()*money.getCurrencyType().getConversionFactor());
     }
 
     public void add(Money money) throws InvalidAmountException {
-        if(this.currencyType != money.getCurrencyType()) throw new InvalidAmountException("currency type should be same");
-        if(money.getValue() < 0 ) throw new InvalidAmountException("Insufficient funds in wallet");
-        this.value += money.getValue();
-    }
 
+        if((money.getValue()*money.getCurrencyType().getConversionFactor()) < 0 ) throw new InvalidAmountException("Insufficient funds in wallet");
+        this.value += (money.getValue()*money.getCurrencyType().getConversionFactor());
+    }
 
 }

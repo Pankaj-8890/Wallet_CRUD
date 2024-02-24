@@ -5,6 +5,7 @@ import com.example.quickstart.exceptions.InvalidAmountException;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 
@@ -12,6 +13,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 public class WalletModel {
 
     @Id
@@ -23,8 +25,10 @@ public class WalletModel {
     @Embedded
     private Money money;
 
-    public WalletModel() throws InvalidAmountException {
-       this.money = new Money(0,CurrencyType.INR);
+
+
+    public WalletModel(String location) throws InvalidAmountException {
+       this.money = new Money(0.0,conversion(location));
     }
 
     public void withdraw(Money money) throws InsufficientFundsException, InvalidAmountException {
@@ -36,6 +40,12 @@ public class WalletModel {
         this.money.add(money);
     }
 
-
+    private CurrencyType conversion(String location){
+        return switch (location) {
+            case ("INDIA") -> Country.INDIA.getCurrency();
+            case ("USA") -> Country.USA.getCurrency();
+            case ("EUROPE") -> Country.EUROPE.getCurrency();
+            default -> Country.INVALID.getCurrency();
+        };
+    }
 }
-//    @SequenceGenerator(name = "wallet_seq", sequenceName = "wallet_seq", allocationSize = 1)

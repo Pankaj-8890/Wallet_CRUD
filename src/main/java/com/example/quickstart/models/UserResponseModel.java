@@ -11,6 +11,6 @@ import lombok.Setter;
 @Setter
 public class UserResponseModel {
 
-    private String message;
+    private UsersModel usersModel;
 
 }

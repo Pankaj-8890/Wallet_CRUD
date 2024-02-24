@@ -1,17 +1,15 @@
 package com.example.quickstart.models;
 
+import com.example.quickstart.exceptions.InvalidAmountException;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 
 @Getter
 @Setter
-@Entity
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
 public class UsersModel {
 
     @Id
@@ -26,13 +24,17 @@ public class UsersModel {
     @Column(name = "password")
     private String password;
 
+    @Column(name = "location")
+    private String location;
+
     @OneToOne(cascade = CascadeType.ALL)
     private WalletModel wallet;
 
-    public UsersModel(String username, String password, WalletModel wallet){
+    public UsersModel(String username, String password,String location) throws InvalidAmountException {
         this.username = username;
         this.password = password;
-        this.wallet = wallet;
+        this.location = location;
+        this.wallet = new WalletModel(location);
     }
 
 }

@@ -3,6 +3,7 @@ package com.example.quickstart.service;
 
 import com.example.quickstart.exceptions.InsufficientFundsException;
 import com.example.quickstart.exceptions.InvalidAmountException;
+import com.example.quickstart.exceptions.WalletNotFoundException;
 import com.example.quickstart.models.Money;
 import com.example.quickstart.models.UsersModel;
 import com.example.quickstart.models.WalletModel;
@@ -25,26 +26,28 @@ public class WalletService {
     @Autowired
     private UserRepository userRepository;
 
-    public WalletResponseModel createWallet() throws InvalidAmountException {
-
-        WalletModel wallet = new WalletModel();
-        walletRepository.save(wallet);
-        return new WalletResponseModel(wallet.getId(), wallet.getMoney());
-    }
-    public WalletResponseModel addMoney(String username, Money money) throws Exception {
+//    public WalletResponseModel createWallet() throws InvalidAmountException {
+//
+//        WalletModel wallet = new WalletModel();
+//        walletRepository.save(wallet);
+//        return new WalletResponseModel(wallet.getId(), wallet.getMoney());
+//    }
+    public WalletResponseModel addMoney(String username, Money money,Long id) throws Exception {
 
 
         UsersModel usersModel = userRepository.findByUsername(username).orElseThrow(()->new UsernameNotFoundException("user not found"));
-        usersModel.getWallet().deposit(money);
-        userRepository.save(usersModel);
+        WalletModel wallet = walletRepository.findById(id).orElseThrow(()-> new WalletNotFoundException("wallet not found"));
+        wallet.deposit(money);
+        walletRepository.save(wallet);
         return new WalletResponseModel(usersModel.getWallet().getId(), usersModel.getWallet().getMoney());
     }
 
-    public WalletResponseModel withdrawMoney(String username,Money money) throws InsufficientFundsException, InvalidAmountException {
+    public WalletResponseModel withdrawMoney(String username,Money money,Long id) throws InsufficientFundsException, InvalidAmountException, WalletNotFoundException {
 
         UsersModel usersModel = userRepository.findByUsername(username).orElseThrow(()->new UsernameNotFoundException("user not found"));
-        usersModel.getWallet().withdraw(money);
-        userRepository.save(usersModel);
+        WalletModel wallet = walletRepository.findById(id).orElseThrow(()-> new WalletNotFoundException("wallet not found"));
+        wallet.withdraw(money);
+        walletRepository.save(wallet);
         return new WalletResponseModel(usersModel.getWallet().getId(), usersModel.getWallet().getMoney());
     }
 

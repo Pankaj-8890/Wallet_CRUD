@@ -2,6 +2,7 @@ package com.example.quickstart.controllers;
 
 import com.example.quickstart.exceptions.InsufficientFundsException;
 import com.example.quickstart.exceptions.InvalidAmountException;
+import com.example.quickstart.exceptions.UserAlreadyExistsException;
 import com.example.quickstart.exceptions.UserNotFoundException;
 import com.example.quickstart.models.TransferMoneyRequestModel;
 
@@ -21,12 +22,12 @@ public class UserController {
     @Autowired
     private UserService userService;
     @PostMapping("")
-    public ResponseEntity<UserResponseModel> createUser(@RequestBody UsersModel usersModel) throws InvalidAmountException {
-        return ResponseEntity.ok(userService.createUser(usersModel.getUsername(), usersModel.getPassword()));
+    public ResponseEntity<UserResponseModel> createUser(@RequestBody UsersModel usersModel) throws InvalidAmountException, UserAlreadyExistsException {
+        return ResponseEntity.ok(userService.createUser(usersModel.getUsername(), usersModel.getPassword(),usersModel.getLocation()));
     }
 
     @DeleteMapping("")
-    public ResponseEntity<UserResponseModel> deleteUser() throws UserNotFoundException {
+    public ResponseEntity<String> deleteUser() throws UserNotFoundException {
         return ResponseEntity.ok(userService.deleteUser());
 
     }
