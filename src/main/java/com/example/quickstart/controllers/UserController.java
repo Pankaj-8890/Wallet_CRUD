@@ -30,11 +30,5 @@ public class UserController {
 
     }
 
-    @PutMapping("/transfer")
-    public ResponseEntity<TransferMoneyResponseModel> transferMoney(@RequestBody TransferMoneyRequestModel transferMoneyRequestModel) throws UserNotFoundException, InvalidAmountException, InsufficientFundsException, WalletNotFoundException {
 
-        TransferMoneyResponseModel response = userService.transferMoney(transferMoneyRequestModel);
-        return ResponseEntity.ok(response);
-
-    }
 }

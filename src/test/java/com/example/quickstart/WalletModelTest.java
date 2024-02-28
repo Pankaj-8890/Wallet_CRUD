@@ -2,10 +2,7 @@ package com.example.quickstart;
 
 import com.example.quickstart.exceptions.InsufficientFundsException;
 import com.example.quickstart.exceptions.InvalidAmountException;
-import com.example.quickstart.models.CurrencyType;
-import com.example.quickstart.models.Money;
-import com.example.quickstart.models.UsersModel;
-import com.example.quickstart.models.WalletModel;
+import com.example.quickstart.models.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -53,7 +50,7 @@ public class WalletModelTest {
     void expectExceptionForInsufficientBalanceWithdrawn() throws InvalidAmountException {
 
         UsersModel user = mock(UsersModel.class);
-        WalletModel wallet = new WalletModel("INDIA",user);
+        WalletModel wallet = new WalletModel(Country.INDIA,user);
         assertThrows(InsufficientFundsException.class, ()-> wallet.withdraw(new Money(100.0, CurrencyType.INR)));
     }
 
