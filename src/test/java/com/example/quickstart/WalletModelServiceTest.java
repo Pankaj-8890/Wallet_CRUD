@@ -72,7 +72,7 @@ public class WalletModelServiceTest {
         when(walletRepository.save(any())).thenReturn(wallet);
 
         when(userRepository.findByUsername("testUser")).thenReturn(Optional.of(usersModel));
-        when(usersModel.getLocation()).thenReturn("USA");
+        when(usersModel.getLocation()).thenReturn(Country.USA);
         WalletModel createdWallet = walletService.createWallet("testUser");
 
         assertNotNull(createdWallet);
@@ -88,7 +88,7 @@ public class WalletModelServiceTest {
         when(walletRepository.save(any())).thenReturn(wallet);
 
         when(userRepository.findByUsername("testUser")).thenReturn(Optional.of(usersModel));
-        when(usersModel.getLocation()).thenReturn("USAY");
+        when(usersModel.getLocation()).thenReturn(Country.INVALID);
 
         assertThrows(InvalidAmountException.class,()-> walletService.createWallet("testUser"));
         verify(walletRepository, times(0)).save(any());
@@ -97,7 +97,7 @@ public class WalletModelServiceTest {
     @Test
     void TestExpectAddMoneyInINRWhenTryToAddUSD() throws Exception {
 
-        UsersModel usersModel = spy(new UsersModel(1L,"test","test","INDIA"));
+        UsersModel usersModel = spy(new UsersModel(1L,"test","test",Country.INDIA));
         WalletModel wallet = mock(WalletModel.class);
         Money money = new Money(0.0,CurrencyType.INR);
 

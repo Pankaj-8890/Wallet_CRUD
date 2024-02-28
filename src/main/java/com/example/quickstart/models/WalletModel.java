@@ -36,7 +36,6 @@ public class WalletModel {
     }
 
     public void withdraw(Money money) throws InsufficientFundsException, InvalidAmountException {
-
         this.money.subtract(money);
     }
 

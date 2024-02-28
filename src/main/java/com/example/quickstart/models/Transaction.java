@@ -22,22 +22,37 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int transactionId;
 
-    private LocalDateTime timestamp;
+//    @ManyToOne(cascade = CascadeType.ALL)
+    private String username;
 
+//    @ManyToOne(cascade = CascadeType.ALL)
+    private String otherParty;
+
+    @Embedded
     private Money money;
 
+    @Column
+    private Double serviceFee;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    private WalletModel senderWallet;
+    @Enumerated(EnumType.STRING)
+    private TransactionType type;
 
+    private LocalDateTime timestamp;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    private WalletModel receiverWallet;
-
-    public Transaction(LocalDateTime timestamp, Money money, WalletModel sender, WalletModel receiver) {
+    public Transaction(LocalDateTime timestamp, Money money, String senderUser, String receiverUser,TransactionType type) {
         this.timestamp = timestamp;
         this.money = money;
-        this.senderWallet = sender;
-        this.receiverWallet = receiver;
+        this.username = senderUser;
+        this.otherParty = receiverUser;
+        this.type = type;
+    }
+
+    public Transaction(LocalDateTime timestamp, Money money, String senderUser, String receiverUser,Double serviceFee,TransactionType type) {
+        this.timestamp = timestamp;
+        this.money = money;
+        this.username = senderUser;
+        this.otherParty = receiverUser;
+        this.type = type;
+        this.serviceFee = serviceFee;
     }
 }

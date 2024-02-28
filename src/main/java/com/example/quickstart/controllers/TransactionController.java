@@ -1,5 +1,6 @@
 package com.example.quickstart.controllers;
 
+import com.example.quickstart.models.Transaction;
 import com.example.quickstart.models.TransactionRequestModel;
 import com.example.quickstart.models.TransactionResponseModel;
 import com.example.quickstart.service.TransactionService;
@@ -21,7 +22,7 @@ public class TransactionController {
 
 
     @GetMapping
-    public ResponseEntity<List<TransactionResponseModel>> allTransactions(){
+    public ResponseEntity<List<Transaction>> allTransactions(){
         return new ResponseEntity<>(transactionService.allTransactions(), HttpStatus.OK);
     }
 }

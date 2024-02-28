@@ -28,9 +28,11 @@ public class TransactionService {
     private WalletService walletService;
 
 
-    public List<TransactionResponseModel> allTransactions() {
+    public List<Transaction> allTransactions() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         UsersModel user = userRepository.findByUsername(username).orElseThrow(()-> new UsernameNotFoundException("Username not found."));
-        return transactionRepository.findAll().stream().map((transaction -> new TransactionResponseModel(transaction.getTimestamp(), transaction.getSenderWallet(), transaction.getReceiverWallet(), transaction.getMoney()))).collect(Collectors.toList());
+        return transactionRepository.findByCurrentUser(username);
     }
 }
+
+//findAll().stream().map((transaction -> new TransactionResponseModel(transaction.getTimestamp(), transaction.getSenderWallet(), transaction.getReceiverWallet(), transaction.getMoney()))).collect(Collectors.toList());
