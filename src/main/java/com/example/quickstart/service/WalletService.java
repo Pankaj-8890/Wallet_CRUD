@@ -4,16 +4,15 @@ package com.example.quickstart.service;
 import com.example.quickstart.exceptions.InsufficientFundsException;
 import com.example.quickstart.exceptions.InvalidAmountException;
 import com.example.quickstart.exceptions.WalletNotFoundException;
-import com.example.quickstart.models.Money;
-import com.example.quickstart.models.UsersModel;
-import com.example.quickstart.models.WalletModel;
-import com.example.quickstart.models.WalletResponseModel;
+import com.example.quickstart.models.*;
 import com.example.quickstart.repository.UserRepository;
 import com.example.quickstart.repository.WalletRepository;
+import com.example.quickstart.repository.WalletTransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -22,6 +21,9 @@ public class WalletService {
 
     @Autowired
     private WalletRepository walletRepository;
+
+    @Autowired
+    private WalletTransactionRepository walletTransactionRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -37,8 +39,13 @@ public class WalletService {
 
         UsersModel usersModel = userRepository.findByUsername(username).orElseThrow(()->new UsernameNotFoundException("user not found"));
         WalletModel wallet = walletRepository.findById(id).orElseThrow(()-> new WalletNotFoundException("wallet not found"));
+        if(!wallet.getUsersModel().equals(usersModel)) throw new WalletNotFoundException("Invalid wallet id");
+
         wallet.deposit(money);
         walletRepository.save(wallet);
+        WalletTransaction walletTransaction = new WalletTransaction(LocalDateTime.now(),money,TransactionType.DEPOSIT);
+        walletTransactionRepository.save(walletTransaction);
+
         return new WalletResponseModel(wallet.getId(), wallet.getMoney());
     }
 
@@ -46,8 +53,12 @@ public class WalletService {
 
         UsersModel usersModel = userRepository.findByUsername(username).orElseThrow(()->new UsernameNotFoundException("user not found"));
         WalletModel wallet = walletRepository.findById(id).orElseThrow(()-> new WalletNotFoundException("wallet not found"));
+        if(!wallet.getUsersModel().equals(usersModel)) throw new WalletNotFoundException("Invalid wallet id");
+
         wallet.withdraw(money);
         walletRepository.save(wallet);
+        WalletTransaction walletTransaction = new WalletTransaction(LocalDateTime.now(),money,TransactionType.WITHDRAW);
+        walletTransactionRepository.save(walletTransaction);
         return new WalletResponseModel(wallet.getId(), wallet.getMoney());
     }
 
