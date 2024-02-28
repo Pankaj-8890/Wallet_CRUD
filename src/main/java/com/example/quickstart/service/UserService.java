@@ -1,9 +1,6 @@
 package com.example.quickstart.service;
 
-import com.example.quickstart.exceptions.InsufficientFundsException;
-import com.example.quickstart.exceptions.InvalidAmountException;
-import com.example.quickstart.exceptions.UserAlreadyExistsException;
-import com.example.quickstart.exceptions.UserNotFoundException;
+import com.example.quickstart.exceptions.*;
 import com.example.quickstart.models.*;
 import com.example.quickstart.repository.TransactionRepository;
 import com.example.quickstart.repository.UserRepository;
@@ -33,13 +30,13 @@ public class UserService {
     @Autowired
     private TransactionRepository transactionRepository;
 
-    public UserResponseModel createUser(String username,String password,String location) throws InvalidAmountException, UserAlreadyExistsException {
+    public UsersModel createUser(String username,String password,Country location) throws InvalidAmountException, UserAlreadyExistsException {
 
         if(userRepository.findByUsername(username).isPresent())
             throw new UserAlreadyExistsException("User already presented");
         UsersModel usersModel = new UsersModel(username,passwordEncoder.encode(password),location);
         userRepository.save(usersModel);
-        return new UserResponseModel(usersModel);
+        return usersModel;
     }
 
     public String deleteUser() throws UserNotFoundException {
@@ -52,20 +49,25 @@ public class UserService {
         return "User " + username + " deleted successfully.";
     }
 
-    public TransferMoneyResponseModel transferMoney(TransferMoneyRequestModel requestModel) throws InvalidAmountException, InsufficientFundsException {
+    public TransferMoneyResponseModel transferMoney(TransferMoneyRequestModel requestModel) throws InvalidAmountException, InsufficientFundsException, WalletNotFoundException {
 
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        UsersModel senderUser = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User "+ username + " not found."));
-        UsersModel receiverUser = userRepository.findByUsername(requestModel.getReceiverName()).orElseThrow(() -> new UsernameNotFoundException("User "+ requestModel.getReceiverName() + " not found."));
+        WalletModel senderWallet = walletRepository.findById(requestModel.getSenderWallet()).orElseThrow(() -> new WalletNotFoundException("wallet not found"));
+        WalletModel receiverWallet = walletRepository.findById(requestModel.getReceiverWallet()).orElseThrow(() -> new WalletNotFoundException("wallet not found"));
 
-        walletService.transferMoney(senderUser.getWallet(),receiverUser.getWallet(),requestModel.getMoney());
-        userRepository.save(senderUser);
-        userRepository.save(receiverUser);
+        if(senderWallet.getMoney().getCurrencyType() != receiverWallet.getMoney().getCurrencyType()){
+            Money money = new Money(10.0,CurrencyType.INR);
+            senderWallet.withdraw(money);
+        }
 
-        Transaction transaction = new Transaction(LocalDateTime.now(),requestModel.getMoney(), senderUser, receiverUser);
+        walletService.transferMoney(senderWallet,receiverWallet,requestModel.getMoney());
+        walletRepository.save(senderWallet);
+        walletRepository.save(receiverWallet);
+
+        Transaction transaction = new Transaction(LocalDateTime.now(),requestModel.getMoney(), senderWallet, receiverWallet);
         transactionRepository.save(transaction);
 
-        return new TransferMoneyResponseModel("money added successfully and remaining balance",senderUser.getWallet().getMoney());
+        return new TransferMoneyResponseModel("money added successfully and remaining balance",senderWallet.getMoney());
     }
 }
 

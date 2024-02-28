@@ -25,16 +25,17 @@ public class UsersModel {
     private String password;
 
     @Column(name = "location")
-    private String location;
+    @Enumerated(EnumType.STRING)
+    private Country location;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    private WalletModel wallet;
+//    @OneToOne(cascade = CascadeType.ALL)
+//    private WalletModel wallet;
 
-    public UsersModel(String username, String password,String location) throws InvalidAmountException {
+    public UsersModel(String username, String password,Country location) throws InvalidAmountException {
         this.username = username;
         this.password = password;
         this.location = location;
-        this.wallet = new WalletModel(location);
+//        this.wallet = new WalletModel(location);
     }
 
 }

@@ -1,9 +1,6 @@
 package com.example.quickstart.controllers;
 
-import com.example.quickstart.exceptions.InsufficientFundsException;
-import com.example.quickstart.exceptions.InvalidAmountException;
-import com.example.quickstart.exceptions.UserAlreadyExistsException;
-import com.example.quickstart.exceptions.UserNotFoundException;
+import com.example.quickstart.exceptions.*;
 import com.example.quickstart.models.TransferMoneyRequestModel;
 
 import com.example.quickstart.models.TransferMoneyResponseModel;
@@ -22,8 +19,9 @@ public class UserController {
     @Autowired
     private UserService userService;
     @PostMapping("")
-    public ResponseEntity<UserResponseModel> createUser(@RequestBody UsersModel usersModel) throws InvalidAmountException, UserAlreadyExistsException {
-        return ResponseEntity.ok(userService.createUser(usersModel.getUsername(), usersModel.getPassword(),usersModel.getLocation()));
+    public ResponseEntity<UsersModel> createUser(@RequestBody UsersModel usersModel) throws InvalidAmountException, UserAlreadyExistsException {
+        UsersModel user = userService.createUser(usersModel.getUsername(), usersModel.getPassword(),usersModel.getLocation());
+        return ResponseEntity.ok(user);
     }
 
     @DeleteMapping("")
@@ -33,7 +31,7 @@ public class UserController {
     }
 
     @PutMapping("/transfer")
-    public ResponseEntity<TransferMoneyResponseModel> transferMoney(@RequestBody TransferMoneyRequestModel transferMoneyRequestModel) throws UserNotFoundException, InvalidAmountException, InsufficientFundsException {
+    public ResponseEntity<TransferMoneyResponseModel> transferMoney(@RequestBody TransferMoneyRequestModel transferMoneyRequestModel) throws UserNotFoundException, InvalidAmountException, InsufficientFundsException, WalletNotFoundException {
 
         TransferMoneyResponseModel response = userService.transferMoney(transferMoneyRequestModel);
         return ResponseEntity.ok(response);

@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 public class TransactionResponseModel {
 
     private LocalDateTime timestamp;
-    private UsersModel sender;
-    private UsersModel receiver;
+    private WalletModel sender;
+    private WalletModel receiver;
     private Money money;
 }

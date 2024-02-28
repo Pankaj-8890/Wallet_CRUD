@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+
+
+package Currencyconverter;
+
+service Currency {
+  rpc ConvertToINR(Request) returns (Response);
+  rpc ConvertFromINR(Request) returns (Response);
+}
+
+message Request {
+  string currency = 1;
+  float value = 2;
+  string targetCurrency = 3;
+};
+
+message Response {
+  float value = 1;
+};

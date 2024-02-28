@@ -26,32 +26,32 @@ public class WalletService {
     @Autowired
     private UserRepository userRepository;
 
-//    public WalletResponseModel createWallet() throws InvalidAmountException {
-//
-//        WalletModel wallet = new WalletModel();
-//        walletRepository.save(wallet);
-//        return new WalletResponseModel(wallet.getId(), wallet.getMoney());
-//    }
-    public WalletResponseModel addMoney(String username, Money money,Long id) throws Exception {
+    public WalletModel createWallet(String username) throws InvalidAmountException {
 
+        UsersModel usersModel = userRepository.findByUsername(username).orElseThrow(()->new UsernameNotFoundException("user not found"));
+        WalletModel wallet = new WalletModel(usersModel.getLocation(),usersModel);
+        walletRepository.save(wallet);
+        return wallet;
+    }
+    public WalletResponseModel addMoney(String username, Money money,Integer id) throws Exception {
 
         UsersModel usersModel = userRepository.findByUsername(username).orElseThrow(()->new UsernameNotFoundException("user not found"));
         WalletModel wallet = walletRepository.findById(id).orElseThrow(()-> new WalletNotFoundException("wallet not found"));
         wallet.deposit(money);
         walletRepository.save(wallet);
-        return new WalletResponseModel(usersModel.getWallet().getId(), usersModel.getWallet().getMoney());
+        return new WalletResponseModel(wallet.getId(), wallet.getMoney());
     }
 
-    public WalletResponseModel withdrawMoney(String username,Money money,Long id) throws InsufficientFundsException, InvalidAmountException, WalletNotFoundException {
+    public WalletResponseModel withdrawMoney(String username,Money money,Integer id) throws InsufficientFundsException, InvalidAmountException, WalletNotFoundException {
 
         UsersModel usersModel = userRepository.findByUsername(username).orElseThrow(()->new UsernameNotFoundException("user not found"));
         WalletModel wallet = walletRepository.findById(id).orElseThrow(()-> new WalletNotFoundException("wallet not found"));
         wallet.withdraw(money);
         walletRepository.save(wallet);
-        return new WalletResponseModel(usersModel.getWallet().getId(), usersModel.getWallet().getMoney());
+        return new WalletResponseModel(wallet.getId(), wallet.getMoney());
     }
 
-    public WalletResponseModel getMoney(Long id){
+    public WalletResponseModel getMoney(Integer id){
         WalletModel wallet = walletRepository.findById(id).orElseThrow(RuntimeException::new);
         return new WalletResponseModel(wallet.getId(),wallet.getMoney());
     }

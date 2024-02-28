@@ -25,10 +25,14 @@ public class WalletModel {
     @Embedded
     private Money money;
 
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id")
+    private UsersModel usersModel;
 
 
-    public WalletModel(String location) throws InvalidAmountException {
-       this.money = new Money(0.0,conversion(location));
+    public WalletModel(Country location,UsersModel user) throws InvalidAmountException {
+       this.money = new Money(0.0,location.getCurrency());
+       this.usersModel = user;
     }
 
     public void withdraw(Money money) throws InsufficientFundsException, InvalidAmountException {
@@ -40,12 +44,12 @@ public class WalletModel {
         this.money.add(money);
     }
 
-    private CurrencyType conversion(String location){
-        return switch (location) {
-            case ("INDIA") -> Country.INDIA.getCurrency();
-            case ("USA") -> Country.USA.getCurrency();
-            case ("EUROPE") -> Country.EUROPE.getCurrency();
-            default -> Country.INVALID.getCurrency();
-        };
-    }
+//    private CurrencyType conversion(String location) throws InvalidAmountException {
+//        return switch (location) {
+//            case ("INDIA") -> Country.INDIA.getCurrency();
+//            case ("USA") -> Country.USA.getCurrency();
+//            case ("EUROPE") -> Country.EUROPE.getCurrency();
+//            default -> throw new InvalidAmountException("Invalid country");
+//        };
+//    }
 }
