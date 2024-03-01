@@ -4,6 +4,7 @@ import com.example.quickstart.exceptions.InvalidAmountException;
 import com.example.quickstart.models.*;
 import com.example.quickstart.repository.UserRepository;
 import com.example.quickstart.repository.WalletRepository;
+import com.example.quickstart.repository.WalletTransactionRepository;
 import com.example.quickstart.service.WalletService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,6 +30,9 @@ public class WalletModelServiceTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private WalletTransactionRepository walletTransactionRepository;
+
     @BeforeEach
     void setUp() {
         openMocks(this);
@@ -41,12 +45,33 @@ public class WalletModelServiceTest {
         when(walletRepository.save(any())).thenReturn(wallet);
 
         when(userRepository.findByUsername("testUser")).thenReturn(Optional.of(usersModel));
-        when(usersModel.getLocation()).thenReturn("INDIA");
+        when(usersModel.getLocation()).thenReturn(Country.INDIA);
         WalletModel createdWallet = walletService.createWallet("testUser");
 
         assertNotNull(createdWallet);
         verify(walletRepository, times(1)).save(any());
     }
+
+
+
+    @Test
+    void TestExpect2WalletCreated() throws InvalidAmountException {
+        WalletModel wallet = new WalletModel();
+        UsersModel usersModel = mock(UsersModel.class);
+        when(walletRepository.save(any())).thenReturn(wallet);
+
+        when(userRepository.findByUsername("testUser")).thenReturn(Optional.of(usersModel));
+        when(usersModel.getLocation()).thenReturn(Country.INDIA);
+        WalletModel createdWallet = walletService.createWallet("testUser");
+        WalletModel createdWallet1 = walletService.createWallet("testUser");
+
+
+        assertNotNull(createdWallet);
+        assertNotNull(createdWallet1);
+        verify(walletRepository, times(2)).save(any());
+
+    }
+
 
     @Test
     void TestExpectWalletCreatedWithINR() throws InvalidAmountException {
@@ -56,7 +81,7 @@ public class WalletModelServiceTest {
         when(walletRepository.save(any())).thenReturn(wallet);
 
         when(userRepository.findByUsername("testUser")).thenReturn(Optional.of(usersModel));
-        when(usersModel.getLocation()).thenReturn("INDIA");
+        when(usersModel.getLocation()).thenReturn(Country.INDIA);
         WalletModel createdWallet = walletService.createWallet("testUser");
 
         assertNotNull(createdWallet);
@@ -81,21 +106,27 @@ public class WalletModelServiceTest {
     }
 
     @Test
-    void TestExpectWalletCreatedWithInvalidCurrencyType() throws InvalidAmountException {
+    void TestExpectAddMoneyInINRWhenTryToAddUSD() throws Exception {
 
-        WalletModel wallet = new WalletModel();
-        UsersModel usersModel = mock(UsersModel.class);
+        UsersModel usersModel = spy(new UsersModel(1L,"test","test",Country.INDIA));
+        WalletModel wallet = mock(WalletModel.class);
+        Money money = new Money(0.0,CurrencyType.INR);
+
+        when(wallet.getUsersModel()).thenReturn(usersModel);
+        when(wallet.getMoney()).thenReturn(money);
         when(walletRepository.save(any())).thenReturn(wallet);
 
         when(userRepository.findByUsername("testUser")).thenReturn(Optional.of(usersModel));
-        when(usersModel.getLocation()).thenReturn(Country.INVALID);
+        when(walletRepository.findById(1)).thenReturn(Optional.of(wallet));
 
-        assertThrows(InvalidAmountException.class,()-> walletService.createWallet("testUser"));
-        verify(walletRepository, times(0)).save(any());
+        walletService.addMoney("testUser",new Money(10.0,CurrencyType.USD),1);
+        verify(wallet,times(1)).deposit(new Money(10.0,CurrencyType.USD));
+        verify(walletRepository, times(1)).save(wallet);
+
     }
 
     @Test
-    void TestExpectAddMoneyInINRWhenTryToAddUSD() throws Exception {
+    void TestExceptThrowErrorWhenAddMoneyInInvalidWallet() throws Exception {
 
         UsersModel usersModel = spy(new UsersModel(1L,"test","test",Country.INDIA));
         WalletModel wallet = mock(WalletModel.class);
