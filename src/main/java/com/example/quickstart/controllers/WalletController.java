@@ -27,7 +27,7 @@ public class WalletController {
         return ResponseEntity.ok(createdWallet);
     }
 
-    @PutMapping("/{wallet_id}/deposit")
+    @PostMapping("/{wallet_id}/deposit")
     public ResponseEntity<WalletResponseModel> deposit(@PathVariable("wallet_id") int walletId, @RequestBody Money money) throws Exception {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
@@ -35,7 +35,7 @@ public class WalletController {
         return ResponseEntity.ok(returnedWallet);
     }
 
-    @PutMapping("/{wallet_id}/withdraw")
+    @PostMapping("/{wallet_id}/withdraw")
     public ResponseEntity<WalletResponseModel> withdraw(@PathVariable("wallet_id") int walletId,@RequestBody Money money) throws WalletNotFoundException, InsufficientFundsException, InvalidAmountException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
